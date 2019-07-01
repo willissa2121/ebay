@@ -35,13 +35,15 @@ inquirer.prompt([main]).then(response => {
 });
 
 let viewProducts = () => {
+  let empty = [];
   var query = connection.query(
     "SELECT p_name p_, p_price, p_inven FROM products",
     (err, res) => {
       if (err) throw err;
       for (var i = 0; i < res.length; i++) {
-        console.log(res[i]);
+        empty.push(res[i]);
       }
+      console.table(empty);
     }
   );
 };
@@ -162,7 +164,8 @@ let addProduct = x => {
       needList,
       {
         type: "input",
-        message: "enter the cost to buy this item",
+        message:
+          "enter the cost to Purchase this item (as a manager to sell, per unit)",
         name: "pCost"
       }
     ])
