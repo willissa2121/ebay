@@ -46,6 +46,7 @@ let viewProducts = () => {
       console.table(empty);
     }
   );
+  connection.end();
 };
 
 let lowInven = () => {
@@ -64,6 +65,7 @@ let lowInven = () => {
             (err, res) => {
               if (err) throw err;
               console.log(`Youre running out of ${res[0].p_name}`);
+              connection.end();
             }
           );
         }
