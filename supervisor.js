@@ -6,9 +6,9 @@ var connection = mysql.createConnection({
   password: "Passwordsucks!1",
   database: "bamazon_db"
 });
+let j = 0;
 
 connection.connect();
-
 inquirer
   .prompt([
     {
@@ -20,8 +20,8 @@ inquirer
   ])
   .then(response => {
     if (response.supChoice == "Look at department earnings") {
-      // updateEarnings();
-      updateProfit();
+      updateEarnings();
+      // updateProfit();
     } else {
       addDepartment();
     }
@@ -32,6 +32,9 @@ let displayEarnings = () => {
     if (err) throw err;
     console.table(res);
   });
+  if (j === 1) {
+    connection.end();
+  }
 };
 
 let addDepartment = () => {
@@ -50,6 +53,7 @@ let addDepartment = () => {
         }', 0,0,0)`,
         (err, res) => {
           if (err) throw err;
+          j = 1;
           displayEarnings();
         }
       );
@@ -93,7 +97,6 @@ let updateCosts = () => {
       empty.push(res[i].id);
     }
     for (var i = 0; i < empty.length; i++) {
-      console.log(empty);
       let t = empty[i];
       connection.query(
         `SELECT SUM(totalCost) FROM products WHERE departmentId=${t}`,
@@ -128,9 +131,7 @@ let updateProfit = () => {
       connection.query(
         `SELECT departments.d_earnings,departments.d_costs FROM departments WHERE id=${t}`,
         (err, res) => {
-          console.log(res);
           let net = Number(res[0].d_earnings) - Number(res[0].d_costs);
-          console.log(net);
           connection.query(
             `UPDATE departments SET d_profit=${net} WHERE id=${t}`,
             (err, res) => {}
@@ -138,6 +139,11 @@ let updateProfit = () => {
         }
       );
     }
-    displayEarnings();
+    if (j === 0) {
+      j++;
+      updateEarnings();
+    } else {
+      displayEarnings();
+    }
   });
 };

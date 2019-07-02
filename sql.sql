@@ -33,7 +33,6 @@ CREATE TABLE departments (
 );
 INSERT INTO departments(d_name,d_earnings,d_costs,d_profit)VALUES("Produce", 0, 0, 0);
 INSERT INTO departments(d_name,d_earnings,d_costs,d_profit)VALUES("Electronics", 0, 0, 0);
-INSERT INTO departments(d_name,d_earnings,d_costs,d_profit)VALUES("Clothing", 0, 0, 0);
 
 
 
