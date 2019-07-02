@@ -14,19 +14,14 @@ inquirer
     {
       type: "list",
       message: "what would you like to do",
-      choices: [
-        "Look at department earnings",
-        "Add a new department",
-        "update test"
-      ],
+      choices: ["Look at department earnings", "Add a new department"],
       name: "supChoice"
     }
   ])
   .then(response => {
     if (response.supChoice == "Look at department earnings") {
-      displayEarnings();
-    } else if (response.supChoice == "update test") {
-      updateEarnings();
+      // updateEarnings();
+      updateProfit();
     } else {
       addDepartment();
     }
@@ -62,23 +57,87 @@ let addDepartment = () => {
 };
 
 let updateEarnings = () => {
+  let empty = [];
   let query = connection.query("SELECT id FROM departments", (err, res) => {
-    let empty = [];
     for (var i = 0; i < res.length; i++) {
       empty.push(res[i].id);
     }
-    for (var i = 0; i < empty.length - 1; i++) {
-      let query = connection.query(
-        "SELECT p_name,totalEarnings FROM products WHERE ?",
-        [
-          {
-            departmentId: empty[i]
-          }
-        ],
+    for (var i = 0; i < empty.length; i++) {
+      console.log(empty);
+      let t = empty[i];
+      connection.query(
+        `SELECT SUM(totalEarnings) FROM products WHERE departmentId=${t}`,
         (err, res) => {
-          console.table(res);
+          if (err) throw err;
+          let a = res[0]["SUM(totalEarnings)"];
+          if (a == null) {
+            a = 0;
+          }
+          connection.query(
+            `UPDATE departments SET d_earnings=${a} WHERE id=${t}`,
+            (err, res) => {
+              if (err) throw err;
+            }
+          );
         }
       );
     }
+    updateCosts();
+  });
+};
+
+let updateCosts = () => {
+  let empty = [];
+  let query = connection.query("SELECT id FROM departments", (err, res) => {
+    for (var i = 0; i < res.length; i++) {
+      empty.push(res[i].id);
+    }
+    for (var i = 0; i < empty.length; i++) {
+      console.log(empty);
+      let t = empty[i];
+      connection.query(
+        `SELECT SUM(totalCost) FROM products WHERE departmentId=${t}`,
+        (err, res) => {
+          if (err) throw err;
+          let a = res[0]["SUM(totalCost)"];
+          if (a == null) {
+            a = 0;
+          }
+          connection.query(
+            `UPDATE departments SET d_costs=${a} WHERE id=${t}`,
+            (err, res) => {
+              if (err) throw err;
+            }
+          );
+        }
+      );
+    }
+    updateProfit();
+  });
+};
+
+let updateProfit = () => {
+  let empty = [];
+  let query = connection.query("SELECT id FROM departments", (err, res) => {
+    for (var i = 0; i < res.length; i++) {
+      empty.push(res[i].id);
+    }
+    for (var i = 0; i < empty.length; i++) {
+      // console.log(empty);
+      let t = empty[i];
+      connection.query(
+        `SELECT departments.d_earnings,departments.d_costs FROM departments WHERE id=${t}`,
+        (err, res) => {
+          console.log(res);
+          let net = Number(res[0].d_earnings) - Number(res[0].d_costs);
+          console.log(net);
+          connection.query(
+            `UPDATE departments SET d_profit=${net} WHERE id=${t}`,
+            (err, res) => {}
+          );
+        }
+      );
+    }
+    displayEarnings();
   });
 };
