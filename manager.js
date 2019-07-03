@@ -9,6 +9,8 @@ var connection = mysql.createConnection({
 });
 connection.connect();
 
+//main object that will ask user what they want
+
 let main = {
   type: "list",
   message: "what would you like to do",
@@ -22,6 +24,8 @@ let main = {
   name: "mainChoice"
 };
 
+//routing based on user input
+
 inquirer.prompt([main]).then(response => {
   if (response.mainChoice == main.choices[0]) {
     viewProducts();
@@ -33,6 +37,8 @@ inquirer.prompt([main]).then(response => {
     stringFunc();
   }
 });
+
+//view current table function
 
 let viewProducts = () => {
   let empty = [];
@@ -48,6 +54,8 @@ let viewProducts = () => {
   );
   connection.end();
 };
+
+//view all products less than 5 in qunatity 
 
 let lowInven = () => {
   let query = connection.query(
@@ -73,6 +81,8 @@ let lowInven = () => {
     }
   );
 };
+
+// increases invetory and calculates the amount of money spent (used for department earnings)
 
 let addInven = () => {
   let empty = [];
@@ -136,6 +146,8 @@ let addInven = () => {
     }
   );
 };
+
+//allows user to create new product with new name, price, quanity, and cost to purchase for resale
 
 let addProduct = x => {
   let list = x;

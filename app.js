@@ -9,6 +9,8 @@ var connection = mysql.createConnection({
 });
 connection.connect();
 let q = 0;
+
+//function that will display current table for the user on start
 let displayTable = () => {
   let empty = [];
   connection.query("SELECT * FROM products", (err, res) => {
@@ -29,6 +31,8 @@ let displayTable = () => {
   });
 };
 
+
+//set of questions for the user select product
 let promptUser = empty => {
   inquirer
     .prompt([
@@ -49,6 +53,8 @@ let promptUser = empty => {
       getPrice(response.itemChoice, response.quantityChoice);
     });
 };
+
+//function that will calculate and set the total money earned via the previous purchase
 
 getPrice = (x, y) => {
   let query = connection.query(
@@ -79,6 +85,8 @@ getPrice = (x, y) => {
     }
   );
 };
+
+//function that will inform user of how much money they just spent
 
 let updatePrice = (x, y) => {
   console.log(y);
