@@ -16,7 +16,7 @@ inquirer
     {
       type: "list",
       message: "what would you like to do",
-      choices: ["Look at department earnings", "Add a new department", "remove a department"],
+      choices: ["Look at department earnings", "Add a new department", "remove a department", "update products"],
       name: "supChoice"
     }
   ])
@@ -26,6 +26,9 @@ inquirer
       // updateProfit();
     } else if (response.supChoice == "Add a new department") {
       addDepartment();
+    }
+    else if (response.supChoice == "update products") {
+      updateTables()
     }
     else {
       getDelete()
@@ -69,7 +72,7 @@ let addDepartment = () => {
     });
 };
 
-//updates current earnings by summing values from other table with via departmentId
+//updates current earnings by summing values from other table via departmentId
 
 let updateEarnings = () => {
   let empty = [];
@@ -243,11 +246,74 @@ let deleteP = (x, deleteD, allD) => {
 }
 
 
+//give the manager the choice to either update product name or delete a product
+
+let updateTables = () => {
+  inquirer.prompt({
+    type: "list",
+    message: "Choose an option",
+    choices: ["change product name", "delete product"],
+    name: "route"
+  }).then(response => {
+    let empty = []
+    connection.query('SELECT p_name FROM products', (err, res) => {
+      for (var i = 0; i < res.length; i++) {
+        empty.push(res[i].p_name)
+      }
+      if (response.route == 'change product name') {
+        changePName(empty)
+      }
+      else{
+        deleteProducts(empty)
+      }
+    })
+  })
+}
+
+//prompts and function if user selects change name of product
+let changePName = (x) => {
+
+  inquirer.prompt([
+    {
+      type: "list",
+      message: "choose a product to alter",
+      choices: x,
+      name: "pChoice"
+    }
+    ,
+    {
+      type: "input",
+      message: "Enter the new name",
+      name: "newName"
+    }
+  ]).then(response => {
+    connection.query(`SELECT id FROM products WHERE p_name='${response.pChoice}'`, (err, res) => {
+      let id = res[0].id
+      
+      connection.query(`UPDATE products SET p_name='${response.newName}' where id=${id}`,(err,res)=>{
+        connection.end()
+
+      })
+    })
+  })
+}
 
 
 
 
-
+let deleteProducts = (x) => {
+  
+  inquirer.prompt({
+    type:"list",
+    message:"Choose a product to delete",
+    choices: x,
+    name : "deleteMe"
+  }).then(response=>{
+    connection.query(`DELETE FROM products WHERE p_name='${response.deleteMe}'`,(err,res)=>{
+      connection.end()
+    })
+  })
+}
 
 
 
